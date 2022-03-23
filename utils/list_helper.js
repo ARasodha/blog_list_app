@@ -116,11 +116,29 @@ const mostLikes = (blogs) => {
   return { author: mostLikesAuth, likes: tracker[mostLikesAuth] }
 }
 
+const users = [
+  {
+    _id: "623a10f7713601171c6a89e8",
+    username: "Arjun",
+    name: "Arjun R",
+    passwordHash: "$2b$10$R9blt.T2vq1p77HLuKybweN98L6DNOLJyDPqBbPdkznw5V536jLdi",
+    __v: 0
+  },
+  {
+    _id: "623a1132713601171c6a89ec",
+    username: "Ronaldo",
+    name: "Cristiano Ronaldo",
+    passwordHash: "$2b$10$P5uOYhP1X0mR0a.cdZ20q.i8RUbpwSX1Wd56fhmN5DC1aT1frKt4i",
+    __v: 0
+  }
+]
+
 module.exports = {
   blogs,
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
-  mostLikes
+  mostLikes,
+  users
 }

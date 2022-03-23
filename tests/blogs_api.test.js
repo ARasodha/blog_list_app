@@ -3,15 +3,17 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../model/blog')
 
 const listHelper = require('../utils/list_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-
-  const blogObjects = listHelper.blogs
-    .map(blog => new Blog(blog))
-  const promiseArray = blogObjects.map(blog => blog.save())
+  await User.deleteMany({})
+  
+  const userObjects = listHelper.users
+  .map(user => new User(user))
+  const promiseArray = userObjects.map(user => user.save())
   await Promise.all(promiseArray)
 })
 
@@ -29,7 +31,7 @@ describe('blog requests', () => {
     response.body.forEach(blog => expect(blog.id).toBeDefined())
   })
 
-  test('verify new blog can be created with POST', async () => {
+  test.only('verify new blog can be created with POST', async () => {
     const newBlog = {
       title: 'New Blog Added for Test',
       author: 'Cristiano Ronaldo',
@@ -39,6 +41,7 @@ describe('blog requests', () => {
 
     await api 
       .post('/api/blogs')
+      .set('Authorization', )
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
