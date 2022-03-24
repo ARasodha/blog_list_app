@@ -24,8 +24,6 @@ const userExtractor = async (request, response, next) => {
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
     request.user = await User.findById(decodedToken.id)
-    console.log('user =>', request.user)
-    console.log(request.user.id)
   }
 
 

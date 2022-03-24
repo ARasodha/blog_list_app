@@ -4,7 +4,7 @@ const usersRouter = require('express').Router()
 
 usersRouter.get('/', async (request, response) => {
   const users = await User.find({}).populate('blogs')
-  console.log(users)
+
   response.json(users)
 })
 
@@ -38,7 +38,6 @@ usersRouter.post('/', async (request, response) => {
     passwordHash,
   })
 
-  console.log('user', user)
   const savedUser = await user.save()
 
   response.status(201).json(savedUser)
