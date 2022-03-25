@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
 
 const BlogForm = (props) => {
   const [title, setTitle] = useState('');
@@ -9,15 +8,18 @@ const BlogForm = (props) => {
   const submitBlog = async (event) => {
     event.preventDefault()
     try {
-      const response = await blogService.create({
+      await props.blogService.create({
         title, author, url
       })
+      props.setNotifMessage([`${title} by ${author} added`, 'success'])
+      setTimeout(() => props.setNotifMessage(['', null]), 5000)
       setTitle('')
       setAuthor('')
       setUrl('')
-      console.log('blog created response', response)
+      props.setBlogs(props.blogs.concat({id: props.blogs.length + 1, title, author, url, likes: 0}))
     } catch (exception) {
-      console.log('blog could not be created')
+      props.setNotifMessage(['blog could not be created', 'error'])
+      setTimeout(() => props.setNotifMessage(['', null]), 5000)
     }
   }
 

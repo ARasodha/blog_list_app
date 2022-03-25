@@ -21,5 +21,13 @@ const create = async (infoObject) => {
   return response.data
 }
 
-let obj = { getAll, setToken, create }
+const deleteBlog = async (userId) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  await axios.delete(`${baseUrl}/${userId}`, config)
+}
+
+let obj = { getAll, setToken, create, deleteBlog }
 export default obj

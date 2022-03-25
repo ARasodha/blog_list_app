@@ -1,67 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
-// import BlogForm from './components/BlogForm'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
-
-const Notification = ({ message }) => {
-  if (message[1] === 'error') {
-    return (
-      <div>
-      <h1>{message[0]}</h1>
-    </div>
-    )
-  }
-
-  return (
-    <div>
-      <h1>{message[0]}</h1>
-    </div>
-  )
-}
-
-const BlogForm = (props) => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [url, setUrl] = useState('')
-
-  const submitBlog = async (event) => {
-    event.preventDefault()
-    try {
-      await blogService.create({
-        title, author, url
-      })
-      props.setNotifMessage([`${title} by ${author} added`, 'success'])
-      setTimeout(() => props.setNotifMessage(['', null]), 5000)
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      props.setBlogs(props.blogs.concat({id: props.blogs.length + 1, title, author, url}))
-    } catch (exception) {
-      props.setNotifMessage(['blog could not be created', 'error'])
-      setTimeout(() => props.setNotifMessage(['', null]), 5000)
-    }
-  }
-
-  return (
-    <>
-      <h1>create new</h1>
-        <div>
-          title
-          <input type="text" name="title" value={title} onChange={({ target }) => setTitle(target.value)}/>
-         </div> 
-        <div>
-          author
-          <input type="text" name="title" value={author} onChange={({ target }) => setAuthor(target.value)}/>
-        </div>
-        <div>
-          url
-          <input type="text" name="title" value={url} onChange={({ target }) => setUrl(target.value)}/>
-        </div>
-        <button type="submit" onClick={submitBlog}>Sumbit</button>
-    </>
-  )
-}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -118,6 +61,12 @@ const App = () => {
       </form>
     </div>
   )
+
+  const blogForm = () => (
+    <Togglable buttonLabel="add blog">
+      <BlogForm blogService={blogService} setBlogs={setBlogs} blogs={blogs} setNotifMessage={setNotifMessage}/>
+    </Togglable>
+  )
   
   const handleLogOut = (event) => {
     event.preventDefault()
@@ -125,12 +74,24 @@ const App = () => {
     setUser(null)
   }
 
+  const deleteBlog = async (event) => {
+    event.preventDefault()
+    const users = await blogService.getAll()
+    const title = event.target.getAttribute('data-title')
+    const blog = users.find((blog) => blog.title === title)
+    const confirmation = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
+    if (!confirmation) return 
+
+    const userId = blog.id
+    await blogService.deleteBlog(userId)
+    setBlogs(blogs.filter(blog => blog.id !== userId))
+  }
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
-  }, [])
+  },[])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -149,9 +110,9 @@ const App = () => {
            <h2>blogs</h2>
            <Notification message={notifMessage}/>
            <p>{user.name} is logged in <button onClick={handleLogOut}>logout</button></p> 
-           <BlogForm setBlogs={setBlogs} blogs={blogs} setNotifMessage={setNotifMessage}/>
-            {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog} />
+            {blogForm()}
+            {blogs.sort((a,b) => a.likes > b.likes).map(blog =>
+              <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} />
             )}
           </div>}
     </div>
